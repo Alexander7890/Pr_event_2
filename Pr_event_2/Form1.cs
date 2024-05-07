@@ -17,32 +17,57 @@ namespace Pr_event_2
         // Змінна для зберігання вибраного елемента
         private Control selectedControl;
         // Змінна для зберігання початкових координат елемента
-        private Point initialLocation; 
+        private Point initialLocation;
+        // Лейбл для виведення координат переміщення текстового поля
+        private Label coordinatesLabel;
 
         public Form1()
         {
             InitializeComponent();
             // Додаємо обробник події MouseClick для форми
             this.MouseClick += Form_MouseClick;
+            // Ініціалізуємо лейбл
+            InitializeCoordinatesLabel();
+        }
+
+        // Ініціалізація лейбла
+        private void InitializeCoordinatesLabel()
+        {
+            coordinatesLabel = new Label();// Створюємо новий лейбл
+            coordinatesLabel.AutoSize = true;// Автоматично визначаємо розмір лейбла
+            coordinatesLabel.Location = new Point(10, 10); // Задаємо початкове розташування лейбла
+            this.Controls.Add(coordinatesLabel); // Додаємо лейбл на форму
         }
 
         private void MoveControlUp(object sender, EventArgs e)
         {
             // Переміщаємо елемент вгору на 10 пікселів
-            if (selectedControl != null) selectedControl.Top -= 10;
+            if (selectedControl != null)
+            {
+                selectedControl.Top -= 10;
+                UpdateCoordinatesLabel(); // Оновлюємо координати у лейблі
+            }
         }
 
         private void MoveControlDown(object sender, EventArgs e)
         {
             // Переміщаємо елемент вниз на 10 пікселів
-            if (selectedControl != null) selectedControl.Top += 10;
+            if (selectedControl != null)
+            {
+                selectedControl.Top += 10;
+                UpdateCoordinatesLabel(); // Оновлюємо координати у лейблі
+            }
         }
 
-        private void MoveControlLeft(object sender, EventArgs e)
+        // Оновлення координат у лейблі
+        private void UpdateCoordinatesLabel()
         {
-            // Переміщаємо елемент вліво на 10 пікселів
-            if (selectedControl != null) selectedControl.Left -= 10; 
+            if (selectedControl != null)
+            {
+                coordinatesLabel.Text = $"Coordinates: X = {selectedControl.Location.X}, Y = {selectedControl.Location.Y}";
+            }
         }
+
         //Повертаємо елемент на початкові координати
         private void ResetControlPosition(object sender, EventArgs e)
         {
@@ -50,18 +75,21 @@ namespace Pr_event_2
             {
                 // Переміщаємо елемент на початкові координати
                 selectedControl.Location = initialLocation;
+                UpdateCoordinatesLabel(); // Оновлюємо координати у лейблі
             }
         }
-       
+
         private void Form_MouseClick(object sender, MouseEventArgs e)
         {
-            if (selectedControl != null)//Перевіряємо чи вибраний елемент
+            // Переміщаємо вибраний елемент на координати кліка
+            if (selectedControl != null)
             {
-                selectedControl.Left = e.X - selectedControl.Width / 2;//Переміщаємо елемент по горизонталі
-                selectedControl.Top = e.Y - selectedControl.Height / 2;//Переміщаємо елемент по вертикалі
+                selectedControl.Left = e.X - selectedControl.Width / 2;
+                selectedControl.Top = e.Y - selectedControl.Height / 2;
+                UpdateCoordinatesLabel(); // Оновлюємо координати у лейблі
             }
         }
-        // Переміщення элемента по кліку
+        // Переміщення елемента по кліку
         private void button1_Click(object sender, EventArgs e)
         {
             if (textBox1.Text == "Start")
@@ -72,6 +100,7 @@ namespace Pr_event_2
                 textBox1.Text = "Stop";
                 //Зберігаємо початкові координати елемента
                 initialLocation = selectedControl.Location;
+                UpdateCoordinatesLabel(); // Оновлюємо координати у лейблі
             }
             else
             {
@@ -79,21 +108,18 @@ namespace Pr_event_2
                 button2.Click -= MoveControlDown;
                 textBox1.Text = "Start";
                 selectedControl = null;
+                coordinatesLabel.Text = ""; // Очищаємо лейбл при зупинці руху елемента
             }
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            Point screenCoords = Control.MousePosition;//Отримуємо координати курсора на екрані
-            Point formCoords = this.PointToClient(screenCoords);//Перетворюємо координати курсора на координати форми
-            MessageBox.Show($"X = {formCoords.X}, Y = {formCoords.Y}");//Виводимо координати курсора на формі
+            button2.Click += MoveControlDown;//Підписуємо кнопку на обробник події
         }
-
         private void button3_Click_1(object sender, EventArgs e)
         {
-            button3.Click += MoveControlLeft;//Підписуємо кнопку на обробник події
+            button3.Click += MoveControlUp;//Підписуємо кнопку на обробник події
         }
-
         private void button4_Click(object sender, EventArgs e)
         {
             button4.Click += ResetControlPosition;//Підписуємо кнопку на обробник події
